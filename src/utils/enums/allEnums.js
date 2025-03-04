@@ -45,3 +45,9 @@ export const allStatus = {
     viewed: "viewed",
     inConsideration: "in consideration"
 }
+
+export const subjects = {
+    register: "Acctivate Acoount",
+    resetPass: "Reset Password",
+    forgetPass: "Forget Password"
+}

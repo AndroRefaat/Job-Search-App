@@ -1,5 +1,7 @@
 import { model, Schema, Types } from "mongoose";
 import { genders, OTPS, providers, roles } from "../../utils/enums/allEnums.js";
+import { hash } from "../../utils/hashing/hash.js";
+import { encrypt } from "../../utils/encryption/encryption.js";
 
 export const defaultSecure_url = 'https://res.cloudinary.com/dtwkoizpn/image/upload/v1739401332/Screenshot_2025-02-12_230055_trxd6j.png'
 export const defaultPublicId = "Screenshot_2025-02-12_230055_trxd6j.png"
@@ -23,7 +25,6 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        required: true
     },
     provider: {
         type: String,
@@ -37,7 +38,6 @@ const userSchema = new Schema({
     },
     DOB: {
         type: Date,
-        required: true,
         validate: {
             validator: (value) => {
                 return new Date().getFullYear() - value.getFullYear() >= 18
@@ -47,7 +47,6 @@ const userSchema = new Schema({
     },
     mobileNumber: {
         type: String,
-        required: true,
         unique: [true, "Mobile number already exists"],
     },
     role: {
@@ -84,16 +83,24 @@ const userSchema = new Schema({
         secure_url: { type: String },
         public_id: { type: String }
     },
-    OTP: [{
-        code: { type: String },
-        type: { type: String, enum: Object.values(OTPS), required: true },
-        expiresIn: { type: Date, required: true },
-    }]
 }, { timestamps: true });
 
 userSchema.virtual('username').get(function () {
     return `${this.firstName} ${this.lastName}`
 })
+
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    this.password = await hash({ plainText: this.password });
+    next();
+})
+
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('mobileNumber')) return next();
+    this.mobileNumber = await encrypt({ plainText: this.mobileNumber });
+    next();
+})
+
 
 const User = model("User", userSchema)
 export default User;
