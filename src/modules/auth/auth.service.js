@@ -58,7 +58,7 @@ export const confirmOTP = asyncHandler(async (req, res, next) => {
 
 export const login = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email, isConfirmed: true, isFreezed: false }).select("+password");
     if (!user) return next(new Error("User not found", { cause: 404 }));
 
     if (user.provider !== providers.system) return next(new Error("please sign in with system account ", { cause: 404 }));
@@ -156,8 +156,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
     if (!isMatch) return next(new Error("Invalid OTP", { cause: 400 }));
 
     const hashPassword = hash({ plainText: password });
-    user.password = hashPassword;
-    await user.save();
+    await User.updateOne({ email }, { password: hashPassword });
 
     await OTP.deleteOne({ email });
     return res.status(200).json({ success: true, message: "Password reset successfully" });

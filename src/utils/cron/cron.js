@@ -11,4 +11,3 @@ asyncHandler(cron.schedule("0 */6 * * *", async () => {
     timezone: "UTC"
 }));
 
-console.log("✅ CRON Job for deleting expired OTPs is running every 6 hours...");
