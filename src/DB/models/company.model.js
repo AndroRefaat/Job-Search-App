@@ -61,6 +61,10 @@ const companySchema = new Schema({
         type: Date,
         default: null
     },
+    isFreezed: {
+        type: Boolean,
+        default: false
+    },
     deletedAt: {
         type: Date,
         default: null
@@ -77,7 +81,14 @@ const companySchema = new Schema({
         type: Boolean,
         default: false
     }
-}, { timestamps: true })
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
+
+companySchema.virtual('jobs', {
+    ref: 'Job',
+    localField: '_id',
+    foreignField: 'companyId'
+})
+
 
 const Company = model("Company", companySchema);
 export default Company
