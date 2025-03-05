@@ -53,6 +53,10 @@ const companySchema = new Schema({
         type: Types.ObjectId,
         ref: "User"
     }],
+    isBanned: {
+        type: Boolean,
+        default: false
+    },
     bannedAt: {
         type: Date,
         default: null
