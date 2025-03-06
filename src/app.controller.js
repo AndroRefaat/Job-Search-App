@@ -26,6 +26,7 @@ const bootstrap = async (app, express) => {
     app.use(helmet());
     app.use(cors());
     app.use(express.json());
+    app.get("/", (req, res) => res.send("Hello World!"));
     await connectDB();
     app.use('/auth', authController)
     app.use('/user', userController)
