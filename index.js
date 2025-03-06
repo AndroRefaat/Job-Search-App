@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 bootstrap(app, express);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 const server = app.listen(port, () => console.log(chalk.blue.bgRed.bold(`Example app listening on port ${port}!`)))
 
 runSocket(server);

@@ -200,7 +200,7 @@ export const getApplicationsExcel = asyncHandler(async (req, res, next) => {
         .sort({ createdAt: -1 }).lean();
 
     if (!applications.length) return next(new Error("No applications found for this date", { cause: 404 }));
-    console.log("Applications Data:", applications);
+
 
     const dir = path.join(process.cwd(), "applications");
     if (!fs.existsSync(dir)) {
