@@ -10,8 +10,21 @@ import jobController from './modules/job/job.controller.js';
 import chatController from './modules/chat/chat.controller.js';
 import { createHandler } from 'graphql-http/lib/use/express';
 import schema from './app.schema.js';
+import cors from 'cors';
+import helmet from 'helmet';
+import { rateLimit } from 'express-rate-limit';
 
 const bootstrap = async (app, express) => {
+    const limiter = rateLimit({
+        windowMs: 15 * 60 * 1000,
+        limit: 10,
+        message: 'Too many requests from this IP, please try again after 15 minutes',
+        legacyHeaders: false,
+        standardHeaders: true,
+    })
+    app.use(limiter);
+    app.use(helmet());
+    app.use(cors());
     app.use(express.json());
     await connectDB();
     app.use('/auth', authController)
