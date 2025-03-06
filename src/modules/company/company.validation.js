@@ -25,3 +25,7 @@ export const getCompanyWithJobsSchema = joi.object({
     companyId: joi.custom(isValidObjectId).required()
 })
 
+export const getApplicationsExcel = joi.object({
+    companyId: joi.custom(isValidObjectId).required(),
+    date: joi.date().required()
+}).required();

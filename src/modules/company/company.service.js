@@ -1,10 +1,14 @@
 import Job from "../../DB/models/job.model.js";
+import User from "../../DB/models/user.model.js";
 import Company from "../../DB/models/company.model.js";
 import { roles } from "../../utils/enums/allEnums.js";
 import { asyncHandler } from "../../utils/errorHandeling/asyncHandler.js";
 import cloudinary from './../../utils/file uploading/cludinary.config.js';
 import { defaultPublicId, defaultSecure_url } from "../../DB/models/user.model.js";
-
+import exceljs from 'exceljs';
+import Application from "../../DB/models/application.model.js";
+import fs from 'fs';
+import path from "path";
 
 export const addCompany = asyncHandler(async (req, res, next) => {
 
@@ -171,3 +175,66 @@ export const deleteCompanyCoverPic = asyncHandler(async (req, res, next) => {
     return res.status(200).json({ success: true, message: "Company cover picture deleted successfully", data: company });
 
 })
+
+export const getApplicationsExcel = asyncHandler(async (req, res, next) => {
+    const { companyId } = req.params;
+    const { date } = req.query;
+
+    const company = await Company.findById(companyId);
+    if (!company) return next(new Error("Company not found", { cause: 404 }));
+
+    const startDate = new Date(date);
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(date);
+    endDate.setHours(23, 59, 59, 999);
+
+
+    const applications = await Application.find({
+        createdAt: { $gte: startDate, $lte: endDate }
+    })
+        .populate({
+            path: "userId",
+            select: "firstName lastName email mobileNumber",
+        })
+        .sort({ createdAt: -1 }).lean();
+
+    if (!applications.length) return next(new Error("No applications found for this date", { cause: 404 }));
+    console.log("Applications Data:", applications);
+
+    const dir = path.join(process.cwd(), "applications");
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+
+    const workbook = new exceljs.Workbook();
+    const worksheet = workbook.addWorksheet("Applications");
+
+    worksheet.columns = [
+        { header: "User Name", key: "userName", width: 25, font: { bold: true } },
+        { header: "Email", key: "email", width: 30, font: { bold: true } },
+        { header: "Mobile Number", key: "mobileNumber", width: 20, font: { bold: true } },
+        { header: "Application Date", key: "createdAt", width: 25, font: { bold: true } },
+    ];
+
+    applications.forEach((application) => {
+        worksheet.addRow({
+            userName: `${application.userId.firstName} ${application.userId.lastName}`,
+            email: application.userId.email,
+            mobileNumber: application.userId.mobileNumber,
+            createdAt: application.createdAt.toISOString(),
+        });
+
+    });
+
+    const filePath = path.join(dir, `${company._id}_${date}.xlsx`);
+    await workbook.xlsx.writeFile(filePath);
+
+    res.download(filePath, `applications_${date}.xlsx`, (err) => {
+        if (err) return next(new Error("Error downloading file", { cause: 500 }));
+
+        fs.unlinkSync(filePath);
+    });
+
+    return res.status(200).json({ success: true, message: "Applications downloaded successfully" });
+});

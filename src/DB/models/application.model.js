@@ -21,7 +21,7 @@ const applicationSchema = new Schema({
         enum: Object.values(allStatus),
         default: allStatus.pending
     }
-}, { timestamps: true });
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
 
 applicationSchema.virtual('user', {
     ref: 'User',

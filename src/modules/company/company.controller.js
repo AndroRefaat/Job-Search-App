@@ -29,5 +29,7 @@ router.delete('/deleteCompanyLogo/:companyId', isAuthenticated, uploadCloud().si
 
 router.delete('/deleteCompanyCoverPic/:companyId', isAuthenticated, uploadCloud().single('image'), isAuthorized(roles.admin, roles.user), companyService.deleteCompanyCoverPic)
 
+router.get('/:companyId/applications/excel', isAuthenticated, isAuthorized(roles.admin, roles.companyHR, roles.companyOwner), validation(companySchemas.getApplicationsExcel), companyService.getApplicationsExcel)
+
 
 export default router;

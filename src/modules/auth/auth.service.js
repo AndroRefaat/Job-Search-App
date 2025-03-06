@@ -58,7 +58,7 @@ export const confirmOTP = asyncHandler(async (req, res, next) => {
 
 export const login = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
-    const user = await User.findOne({ email, isConfirmed: true, isFreezed: false }).select("+password");
+    const user = await User.findOne({ email, isConfirmed: true }).select("+password");
     if (!user) return next(new Error("User not found", { cause: 404 }));
 
     if (user.provider !== providers.system) return next(new Error("please sign in with system account ", { cause: 404 }));
