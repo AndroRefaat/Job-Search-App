@@ -9,15 +9,18 @@ const jobSchema = new Schema({
     },
     jobLocation: {
         type: String,
-        enums: Object.values(jobLocations)
+        enums: Object.values(jobLocations),
+        required: true
     },
     workingTime: {
         type: String,
-        enums: Object.values(workingTimes)
+        enums: Object.values(workingTimes),
+        required: true
     },
     seniorityLevel: {
         type: String,
-        enums: Object.values(seniorityLevels)
+        enums: Object.values(seniorityLevels),
+        required: true
     },
     jobDescription: {
         type: String,
@@ -45,6 +48,30 @@ const jobSchema = new Schema({
         ref: "Company"
     }
 }, { timestamps: true });
+
+jobSchema.query.paginate = async function (page, limit = 4) {
+    page = page ? page : 1;
+    const skip = limit * (page - 1);
+
+    const data = await this.skip(skip).limit(limit);
+    const totalItems = await this.model.countDocuments();
+
+    return {
+        data,
+        currentPage: Number(page),
+        totalItems: totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+        itemsPerPage: data.length
+    }
+
+}
+
+jobSchema.virtual("applications", {
+    ref: "Application",
+    localField: "_id",
+    foreignField: "jobId"
+})
+
 
 const Job = model("Job", jobSchema);
 export default Job;

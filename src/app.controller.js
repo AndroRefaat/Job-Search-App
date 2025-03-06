@@ -6,6 +6,7 @@ import authController from './modules/auth/auth.controller.js';
 import userController from './modules/user/user.controller.js';
 import adminController from './modules/admin/admin.controller.js';
 import companyController from './modules/company/company.controller.js';
+import jobController from './modules/job/job.controller.js';
 import { createHandler } from 'graphql-http/lib/use/express';
 import schema from './app.schema.js';
 
@@ -17,6 +18,7 @@ const bootstrap = async (app, express) => {
     app.use('/graphql', createHandler({ schema }));
     app.use('/admin', adminController)
     app.use('/company', companyController)
+    app.use('/job', jobController)
     app.all('*', notFoundHandler)
     app.use(globalErrorHandler);
 }

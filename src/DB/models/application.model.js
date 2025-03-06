@@ -23,5 +23,25 @@ const applicationSchema = new Schema({
     }
 }, { timestamps: true });
 
+applicationSchema.virtual('user', {
+    ref: 'User',
+    localField: 'userId',
+    foreignField: '_id'
+})
+
+applicationSchema.query.paginate = async function (page = 1, limit = 4) {
+    const skip = (page - 1) * limit;
+    const data = await this.skip(skip).limit(limit);
+    const totalItems = await this.model.countDocuments();
+
+    return {
+        data,
+        currentPage: Number(page),
+        totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+        itemsPerPage: data.length
+    };
+};
+
 const Application = model("Application", applicationSchema);
 export default Application

@@ -110,12 +110,20 @@ userSchema.pre('save', async function (next) {
     next();
 })
 
-userSchema.post('findOne', async function (doc) {
-    if (doc && doc.mobileNumber) {
-        doc.mobileNumber = decrypt({ cipherText: doc.mobileNumber });
+userSchema.post(["find", "findOne"], async function (docs) {
+    if (!docs) return;
+    if (Array.isArray(docs)) {
+        docs.forEach(doc => {
+            if (doc.mobileNumber) {
+                doc.mobileNumber = decrypt({ cipherText: doc.mobileNumber });
+            }
+        });
+    } else {
+        if (docs.mobileNumber) {
+            docs.mobileNumber = decrypt({ cipherText: docs.mobileNumber });
+        }
     }
-})
-
+});
 
 const User = model("User", userSchema)
 export default User;

@@ -6,7 +6,10 @@ import { validation } from './../../middlewares/validation.middleware.js';
 import * as companyService from '../company/company.service.js'
 import * as companySchemas from '../company/company.validation.js'
 import { uploadCloud } from './../../utils/file uploading/multer.cloudinary.js';
+import jobController from '../job/job.controller.js';
 const router = Router();
+
+router.use('/:companyId/jobs', jobController)
 
 router.post('/addCompany', isAuthenticated, isAuthorized(roles.admin, roles.user), validation(companySchemas.addCompanySchema), companyService.addCompany)
 

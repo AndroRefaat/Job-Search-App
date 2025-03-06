@@ -10,7 +10,9 @@ export const genders = {
 
 export const roles = {
     user: "user",
-    admin: "admin"
+    admin: "admin",
+    companyHR: "companyHR",
+    companyOwner: "companyOwner"
 }
 
 export const OTPS = {
@@ -49,5 +51,7 @@ export const allStatus = {
 export const subjects = {
     register: "Acctivate Acoount",
     resetPass: "Reset Password",
-    forgetPass: "Forget Password"
+    forgetPass: "Forget Password",
+    accepted: "Accepted",
+    rejected: "Rejected",
 }

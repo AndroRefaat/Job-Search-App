@@ -73,7 +73,7 @@ export const updatePassword = asyncHandler(async (req, res, next) => {
     if (!passwordMatch) return next(new Error("Invalid old password", { cause: 400 }));
 
     const hashPassword = hash({ plainText: newPassword });
-    await User.findByIdAndUpdate(req.user._id, { password: hashPassword, changeCredentialTime: Date.now() }, { new: true, runValidators: true });
+    await User.findByIdAndUpdate(req.user._id, { password: hashPassword, changeCredentialTime: Date.now(), updatedBy: req.user._id }, { new: true, runValidators: true });
 
 
     return res.status(200).json({ success: true, message: "Password updated successfully" });
