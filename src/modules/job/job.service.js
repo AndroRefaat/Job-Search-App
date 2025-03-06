@@ -3,7 +3,7 @@ import { asyncHandler } from "../../utils/errorHandeling/asyncHandler.js";
 import Company from './../../DB/models/company.model.js';
 import Application from './../../DB/models/application.model.js';
 import cloudinary from './../../utils/file uploading/cludinary.config.js';
-import { io } from "../../socketio/index.js";
+import io from "../../socketio/index.js";
 import { eventEmitter } from './../../utils/emails/emailEvent.js';
 import { subjects } from "../../utils/enums/allEnums.js";
 

@@ -1,28 +1,27 @@
 import { Server } from "socket.io";
 import { jobSocketHandler } from "./job.socket.service.js";
+import socketAuth from "./middleware/authorization.socket.js";
 
-export let io;
-
-export const runSocket = (server) => {
-    io = new Server(server, {
+export const runSocket = function (server) {
+    const io = new Server(server, {
         cors: {
             origin: "*",
-        },
-        allowEIO3: true // ✅ حل مشكلة عدم الاتصال بـ WebSocket في بعض الحالات
+        }
     });
+
+    io.use(socketAuth);
 
     io.on("connection", (socket) => {
-        console.log(`User connected: ${socket.id}`);
-
-        socket.on("join", (userId) => {
-            socket.join(userId);
-            console.log(`User ${userId} joined their personal room`);
-        });
-
+        console.log("User connected", socket.user._id);
         jobSocketHandler(socket, io);
+        socket.on("sendMessage", sendMessage(socket, io));
 
         socket.on("disconnect", () => {
-            console.log(`User disconnected: ${socket.id}`);
+            console.log("User disconnected", socket.user._id);
         });
     });
+
+    return io;
 };
+
+export default runSocket;
