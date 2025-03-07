@@ -30,7 +30,20 @@ const bootstrap = async (app, express) => {
     await connectDB();
     app.use('/auth', authController)
     app.use('/user', userController)
-    app.use('/graphql', createHandler({ schema }));
+    app.use('/graphql', createHandler({
+        schema,
+        context: (req) => {
+            const { authorization } = req.headers;
+            return { authorization }
+        },
+        formatError: (err) => {
+            return {
+                success: false,
+                message: err.originalError.message,
+                statusCode: err.originalError?.cause || 500
+            }
+        }
+    }))
     app.use('/admin', adminController)
     app.use('/company', companyController)
     app.use('/job', jobController)
